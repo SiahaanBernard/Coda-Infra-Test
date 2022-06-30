@@ -36,6 +36,9 @@ resource "aws_subnet" "public" {
         var.vpc_name,
         substr(element(data.aws_availability_zones.all.names, count.index), -1, 1),
       )
+    },
+    {
+      "Tier" = "public"
     }
   )
 }
@@ -52,6 +55,9 @@ resource "aws_subnet" "private" {
         var.vpc_name,
         substr(element(data.aws_availability_zones.all.names, count.index), -1, 1),
       )
+    },
+    {
+      "Tier" = "Private"
     }
   )
 }
