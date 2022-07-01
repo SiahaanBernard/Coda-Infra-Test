@@ -57,7 +57,7 @@ resource "aws_subnet" "private" {
       )
     },
     {
-      "Tier" = "Private"
+      "Tier" = "private"
     }
   )
 }
@@ -73,7 +73,7 @@ resource "aws_eip" "nat" {
 resource "aws_nat_gateway" "private" {
   count         = length(aws_eip.nat)
   allocation_id = element(aws_eip.nat.*.id, count.index)
-  subnet_id     = element(aws_subnet.private.*.id, count.index)
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
   depends_on = [
     aws_internet_gateway.prod
   ]
