@@ -18,7 +18,7 @@ resource "aws_lb_target_group" "payment_ec2" {
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.test.id
   health_check {
-    path = "/health.html"
+    path = "/"
   }
   tags = {
     Name = "${var.service_name}-target-group"
@@ -98,21 +98,25 @@ resource "aws_security_group_rule" "to_service_on_service_port" {
 resource "aws_instance" "app" {
   for_each             = toset(data.aws_subnets.private.ids)
   instance_type        = "t2.micro"
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.arn
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
   security_groups      = [aws_security_group.app_instance.id]
   subnet_id            = each.value
-  ami                  = "ami-0c802847a7dd848c0"
+  ami                  = "ami-04ff9e9b51c1f62ca"
   root_block_device {
     volume_size = "8"
     volume_type = "gp3"
   }
   tags = {
-    Name = format("${var.service_name}-%s", each.key + 1)
+    Name = format("${var.service_name}-%s", each.key)
   }
   user_data = <<EOF
 #!/bin/bash
-pip install flask -y
-yum install git -y
+sudo apt update
+sudo apt install git
+sudo apt install python3-pip -y
+exp FLASK_APP=main.py
+cd /home/ubuntu && git clone https://github.com/SiahaanBernard/Coda-Simple-App.git
+cd /home/ubuntu/Coda-Simple-App && python3 -m pip install -r requirements.txt && python3 main.py
 }
 EOF
 }

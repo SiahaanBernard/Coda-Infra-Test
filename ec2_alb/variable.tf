@@ -1,6 +1,6 @@
 variable "service_port" {
   description = "port used for the service"
-  default     = 23450
+  default     = 8080
 }
 
 variable "vpc_name" {
