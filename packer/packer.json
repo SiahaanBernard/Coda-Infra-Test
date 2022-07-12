@@ -1,0 +1,42 @@
+{
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "region": "ap-southeast-1",
+            "source_ami_filter": {
+                "filters": {
+                    "virtualization-type": "hvm",
+                    "name": "ubuntu/images/*ubuntu-focal-20.04-amd64-server-*",
+                    "root-device-type": "ebs"
+                },
+                "owners": [
+                    "099720109477"
+                ],
+                "most_recent": true
+            },
+            "iam_instance_profile": "image-builder",
+            "instance_type": "t2.micro",
+            "ssh_username": "ubuntu",
+            "communicator": "ssh",
+            "security_group_id": "sg-020946b9d66e5439c",
+            "ami_name": "app-image-{{timestamp}}"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "inline": [
+                "echo set debconf to Noninteractive",
+                "echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections",
+                "sleep 15",
+                "sudo apt update",
+                "sudo apt upgrade -y",
+                "sudo apt install git wget -y",
+                "sudo apt install ruby-full -y",
+                "sudo apt install python3-pip -y",
+                "wget -P /home/ubuntu https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install",
+                "chmod +x /home/ubuntu/install && sudo /home/ubuntu/install auto > /tmp/logfile && rm install"
+            ]
+        }
+    ]
+}
